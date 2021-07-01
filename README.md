@@ -1,1 +1,1 @@
-# Shashki-
+# Checkers-
