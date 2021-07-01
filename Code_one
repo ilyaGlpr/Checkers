@@ -1,0 +1,140 @@
+#include <SFML/Graphics.hpp>
+#include <iostream>
+using namespace sf;
+
+#define SIZE_Board 8 //размер шашечных полей
+#define Black 4 //чёрная шашка
+#define White -4 //белая шашка
+
+//структура для записи позиций
+struct poz
+{
+	int x, y;
+}oldPoz, regeleAlb, regeleNegru;
+
+int  size = 100, move = 0, x, y;
+//Расположение шашек на доске, -4=белые, 4=чёрные
+int board[8][8] =
+{ 0, 4, 0, 4, 0, 4, 0, 4,
+  4, 0, 4, 0, 4, 0, 4, 0,
+  0, 4, 0, 4, 0, 4, 0, 4,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0,
+  -4, 0, -4, 0, -4, 0, -4, 0,
+  0,-4, 0,-4, 0,-4, 0,-4,
+ -4, 0,-4, 0,-4, 0,-4, 0, };
+
+int turnAlbDreapta = 0;
+int mutare = 0; // 0 ход белых, 1 ход чёрных
+int sahAlb = 0, sahNegru = 0;
+
+int main()
+{
+	RenderWindow window(VideoMode(800, 800), L"Шашки", sf::Style::Close | sf::Style::Titlebar);//Размер,название,запрет возможности изменять размер окна
+	//Иконка окна
+	Image icon;
+	if (!icon.loadFromFile("images/icon.png"))
+	{
+		return 1;
+	}
+	window.setIcon(300, 300, icon.getPixelsPtr());
+
+	Texture t1, t2, t3;
+	t1.loadFromFile("images/board.png");//Доска(поля)
+	t2.loadFromFile("images/black1.png");//Чёрная шашка
+	t3.loadFromFile("images/white.png");//Белая шашка
+
+	//Геометрические фигуры с нанесенной поверх нее текстурой
+	Sprite tabla(t1);//спрайт доски
+	Sprite Black_sp(t2);//спрайт чёрной шашки
+	Sprite White_sp(t3);//спрайт белой шашки
+	Sprite Mutare;
+
+	float dx = 0, dy = 0;
+	int num_move = 0;
+
+	while (window.isOpen())
+	{
+		//Запись координат мыши в окне по x и y
+		Vector2i pos = Mouse::getPosition(window);
+		x = pos.x / size;
+		y = pos.y / size;
+		
+		Event e;
+		while (window.pollEvent(e))
+		{
+			if (e.type == Event::Closed)
+			{
+				window.close();//Закрытие окна
+			}
+			window.clear();//Очистка окна после хода
+			if (e.type == Event::MouseButtonPressed)
+			{
+				if (e.key.code == Mouse::Left)//отслеживаем нажатие ЛВМ
+				{
+
+					if (board[y][x] != 0)
+					{
+						dx = pos.x - x * 100;
+						dy = pos.y - y * 100;
+						if (board[y][x] == Black && mutare == 1)
+						{
+							num_move = Black;
+							Mutare = Black_sp;
+							board[y][x] = 0;
+						}
+						if (board[y][x] == White && mutare == 0)
+						{
+							num_move = White;
+							Mutare = White_sp;
+							board[y][x] = 0;
+						}
+						if (board[y][x] == 0)
+						{
+							move = 1;
+							oldPoz.x = x;
+							oldPoz.y = y;
+						}
+					}
+				}
+			}
+
+			if (e.type == Event::MouseButtonReleased)
+			{
+				if (e.key.code == Mouse::Left)
+				{
+					int ok = 2;
+				}
+			}
+		}
+		// Ввод на экран после хода 
+		window.clear();
+		window.draw(tabla);
+		if (move == 1)
+		{
+			Mutare.setPosition(pos.x - dx, pos.y - dy);
+			window.draw(Mutare);
+		}
+		for (int i = 0; i < SIZE_Board; i++)
+		{
+			for (int j = 0; j < SIZE_Board; j++)
+			{
+				if (board[i][j] != 0)
+				{
+					if (board[i][j] == Black)
+					{
+						Black_sp.setPosition(j * size, i * size);
+						window.draw(Black_sp);
+					}
+					if (board[i][j] == White)
+					{
+						White_sp.setPosition(j * size, i * size);
+						window.draw(White_sp);
+					}
+				}
+			}
+		}
+		window.display();
+	}
+	return 0;
+}
